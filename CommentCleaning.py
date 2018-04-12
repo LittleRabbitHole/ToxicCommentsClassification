@@ -5,18 +5,18 @@ Created on Wed Apr 11 11:21:25 2018
 
 @author: angli
 """
-import pandas as pd
-import os
+#import pandas as pd
+#import os
 import logging
-import argparse
+#import argparse
 import re
 from nltk.corpus import stopwords
 import nltk
 #nltk.download('popular')
 from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
-#import HTMLParser
-import html
+import HTMLParser
+#import html
 import pickle
 
 logging.basicConfig(level=logging.INFO)
@@ -53,14 +53,14 @@ def cleanComment(comment):
     clean_UrlSmileIP = re.sub(IP_PATTERN, '', clean_UrlSmile)
     clean_final = re.sub(NUMBERS_PATTERN, '', clean_UrlSmileIP)
     #lower case
-    commentText = str(clean_final).replace("\n"," ").lower()
+    commentText = clean_final.replace("\n"," ").lower()
     #into list
     comment_lst = commentText.split(" ")
     comment_lst = list(filter(None, comment_lst))
     #if not none
     if len(comment_lst) >= 1 and comment_lst[0] != '':
-        #comment_lst = [HTMLParser.HTMLParser().unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
-        comment_lst = [html.unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
+        comment_lst = [HTMLParser.HTMLParser().unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
+        #comment_lst = [html.unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
         #final remove leading/trailing puctuation each word
         comment_lst1 = [s.strip("`~()?:!.,;'""&*<=+ >#|-/{}%$^@[]") for s in comment_lst]
         #remove non-letter in middle
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         #pickle.dump(all_comments_lst, f, protocol=2)
 
     # read file    
-    comments_lst = pickle.load( open( "/home/angatpitt/wiki_comments/all_toxic_comments_lst.pkl", "rb" ) )
+    comments_lst = pickle.load( open( "/home/ang/Comments/all_toxic_comments_lst.pkl", "rb" ) )
     _log.info("Reading file ...")
     
     clean_comments = []
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         clean_comments.append(clean_comment)
 
     _log.info("writing file ...")    
-    with open('/home/angatpitt/wiki_comments/clean_comments.pkl', 'wb') as f:
+    with open('/home/ang/Comments/clean_comments.pkl', 'wb') as f:
         pickle.dump(clean_comments, f)
     
     _log.info("done")    
