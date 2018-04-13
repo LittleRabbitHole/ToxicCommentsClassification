@@ -17,7 +17,8 @@ from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 import HTMLParser
 #import html
-import pickle
+#import pickle
+import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
 _log = logging.getLogger('get_CleanComments')
@@ -90,28 +91,32 @@ def cleanComment(comment):
 
 
 if __name__ == "__main__":
-    #train = pd.read_csv("/Users/angli/Ang/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/train.csv")
+    #train = pd.read_csv("/Users/Ang/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/train.csv")
     #all_comments_lst = list(train["comment_text"])
     #with open('/Users/angli/ANG/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/all_toxic_comments_lst.pkl', 'wb') as f:
         #pickle.dump(all_comments_lst, f, protocol=2)
 
     # read file    
-    comments_lst = pickle.load( open( "/home/ang/Comments/all_toxic_comments_lst.pkl", "rb" ) )
+    #comments_lst = pickle.load( open( "/home/ang/Comments/all_toxic_comments_lst.pkl", "rb" ) )
+    train = pd.read_csv("/home/ang/Comments/test.csv")
     _log.info("Reading file ...")
     
     clean_comments = []
     n=0
-    for comment in comments_lst:
+    for ind, row in train.iterrows():
         n+=1
         if n % 2000 == 0: 
             _log.info("process line {}...".format(n))
             
-        clean_comment = cleanComment(comment)
+        clean_comment = cleanComment(row["comment_text"])
         clean_comments.append(clean_comment)
-
+    
+    train["clean_comment"] = clean_comments
+    
     _log.info("writing file ...")    
-    with open('/home/ang/Comments/clean_comments.pkl', 'wb') as f:
-        pickle.dump(clean_comments, f)
+    #with open('/home/ang/Comments/clean_comments.pkl', 'wb') as f:
+        #pickle.dump(clean_comments, f)
+    train.to_csv("/home/ang/Comments/test_cleaned.csv", index=False)
     
     _log.info("done")    
 
