@@ -34,14 +34,15 @@ if __name__ == "__main__":
     model = Word2Vec.load('{}/cleantxt_200.w2v'.format(model_path))
     
     # get comments
-    all_comments = pd.read_csv("/home/ang/Comments/train_cleaned.csv")
+    all_comments = pd.read_csv("/home/ang/Comments/test_cleaned.csv")
     #all_comments['w2v'] = np.nan
     #all_comments['w2v'] = all_comments['w2v'].astype(object)
     
     #store in dict
     comment2vec = {}
     
-    n=0
+    n=0 #recording # of comments that has no vecs
+    m=0 #recording # of empty comments
     for index, row in all_comments.iterrows():
         comment_id = row['id']
         cleancomment = row['clean_comment']
@@ -65,7 +66,6 @@ if __name__ == "__main__":
                     except Exception:
                         #print ('word: "{}" is not in the vocabulary of the model located at: "{}"'.format(word, model_path))
                         word_vec = np.zeros((200,))
-                        n+=1
                 #mean
                 comment_vec_mean = comment_vec/nwords
                 
@@ -73,13 +73,15 @@ if __name__ == "__main__":
                     #set value
                     comment2vec[comment_id] = comment_vec_mean
                 else:
+                    n+=1
                     print ("index " + str(index)+ " has not result ...")
-
+        else:
+            m += 1
     #save to pickle
-    with open('/home/ang/Comments/train_c2v.pkl', 'wb') as f:
+    with open('/home/ang/Comments/test_c2v.pkl', 'wb') as f:
         pickle.dump(comment2vec, f)
     #comment2vec.to_pickle("/home/ang/Comments/train_c2v.pkl")
-    print (n)
+    print ('num of comments that has no vecs is: '+str(n) + '\n' + "# of empty comments: "+str(m))
     #df = pd.read_pickle("/home/ang/BLM_hashtags/aggre_data/aggre_tweet_hashtag_t2v.pkl")
-    
+    #clean train: 159505
 
