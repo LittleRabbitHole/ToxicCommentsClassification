@@ -33,47 +33,52 @@ if __name__ == "__main__":
     model_path = '{}/w2vmodel'.format(model_dir_path)
     model = Word2Vec.load('{}/cleantxt_200.w2v'.format(model_path))
     
-    # get tweets
-    #all_word_lst = pickle.load( open( "aggre_tweet_hashtag_cleantweet.pkl", "rb" ) )
-    all_tweets = pd.read_csv("/home/ang/BLM_hashtags/aggre_data/aggre_tweet_hashtag_cleantweet.csv")
-    all_tweets = all_tweets.drop_duplicates()
-    all_tweets['w2v'] = np.nan
-    all_tweets['w2v'] = all_tweets['w2v'].astype(object)
+    # get comments
+    all_comments = pd.read_csv("/home/ang/Comments/train_cleaned.csv")
+    #all_comments['w2v'] = np.nan
+    #all_comments['w2v'] = all_comments['w2v'].astype(object)
+    
+    #store in dict
+    comment2vec = {}
     
     n=0
-    for index, row in all_tweets.iterrows():
-        cleantweet = row['tweettext_clean']
+    for index, row in all_comments.iterrows():
+        comment_id = row['id']
+        cleancomment = row['clean_comment']
         
         if index % 10000 == 0: print (index)
         
         #check nan
-        if cleantweet is not np.nan:
-            wordlist = cleantweet.split(" ")
+        if cleancomment is not np.nan:
+            wordlist = cleancomment.split(" ")
             
             if len(wordlist)>0:
                 #get the tweet vec as mean
-                tweet_vec = np.zeros((200,))
+                comment_vec = np.zeros((200,))
                 
                 nwords = 0
                 for word in wordlist:
                     try:
                         word_vec = np.array(model[word])
-                        tweet_vec += word_vec
+                        comment_vec += word_vec
                         nwords += 1
                     except Exception:
                         #print ('word: "{}" is not in the vocabulary of the model located at: "{}"'.format(word, model_path))
                         word_vec = np.zeros((200,))
                         n+=1
                 #mean
-                tweet_vec_mean = tweet_vec/nwords
-                if not np.isnan(tweet_vec_mean[0]): 
+                comment_vec_mean = comment_vec/nwords
+                
+                if not np.isnan(comment_vec_mean[0]): 
                     #set value
-                    all_tweets = all_tweets.set_value(index, 'w2v', tweet_vec_mean)
+                    comment2vec[comment_id] = comment_vec_mean
                 else:
                     print ("index " + str(index)+ " has not result ...")
 
     #save to pickle
-    all_tweets.to_pickle("/home/ang/BLM_hashtags/aggre_data/aggre_tweet_hashtag_t2v.pkl")
+    with open('/home/ang/Comments/train_c2v.pkl', 'wb') as f:
+        pickle.dump(comment2vec, f)
+    #comment2vec.to_pickle("/home/ang/Comments/train_c2v.pkl")
     print (n)
     #df = pd.read_pickle("/home/ang/BLM_hashtags/aggre_data/aggre_tweet_hashtag_t2v.pkl")
     
