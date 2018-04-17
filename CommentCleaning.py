@@ -19,6 +19,8 @@ import HTMLParser
 #import html
 #import pickle
 import pandas as pd
+#nltk.download('punkt')
+#nltk.download('maxent_treebank_pos_tagger')
 
 logging.basicConfig(level=logging.INFO)
 _log = logging.getLogger('get_CleanComments')
@@ -100,7 +102,7 @@ if __name__ == "__main__":
 
     # read file    
     #comments_lst = pickle.load( open( "/home/ang/Comments/all_toxic_comments_lst.pkl", "rb" ) )
-    train = pd.read_csv("/home/ang/Comments/test.csv")
+    train = pd.read_csv("/home/ang/Comments/train.csv")
     _log.info("Reading file ...")
     
     clean_comments = []
@@ -117,12 +119,12 @@ if __name__ == "__main__":
     train["clean_comment"] = clean_comments
     
     #drop the raw comments
-    train = train.drop(columns=["comment_text"])
+    train = train.drop(['comment_text'], axis=1) 
     
     _log.info("writing file ...")    
     #with open('/home/ang/Comments/clean_comments.pkl', 'wb') as f:
         #pickle.dump(clean_comments, f)
-    train.to_csv("/home/ang/Comments/test_cleaned.csv", index=False)
+    train.to_csv("/home/ang/Comments/train_cleaned.csv", index=False)
     
     _log.info("done")    
 

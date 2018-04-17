@@ -34,7 +34,7 @@ if __name__ == "__main__":
     model = Word2Vec.load('{}/cleantxt_200.w2v'.format(model_path))
     
     # get comments
-    all_comments = pd.read_csv("/home/ang/Comments/test_cleaned.csv")
+    all_comments = pd.read_csv("/home/ang/Comments/train_cleaned.csv")
     #all_comments['w2v'] = np.nan
     #all_comments['w2v'] = all_comments['w2v'].astype(object)
     
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         else:
             m += 1
     #save to pickle
-    with open('/home/ang/Comments/test_c2v.pkl', 'wb') as f:
+    with open('/home/ang/Comments/train_c2v.pkl', 'wb') as f:
         pickle.dump(comment2vec, f)
     #comment2vec.to_pickle("/home/ang/Comments/train_c2v.pkl")
     print ('num of comments that has no vecs is: '+str(n) + '\n' + "# of empty comments: "+str(m))

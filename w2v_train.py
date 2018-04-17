@@ -19,7 +19,7 @@ def loadt(log):
     #flist = glob.glob('{}*'.format(path))
     #for f_name in flist:
     print('\nprocessing file')
-    comments = pickle.load( open( "/home/ang/Comments/all_clean_comments_lst.pkl", "rb" ) )
+    comments = pickle.load( open( "/home/ang/Comments/train_clean_comments.pkl", "rb" ) )
     for line in comments:
         i += 1
         if type(line) != float:
