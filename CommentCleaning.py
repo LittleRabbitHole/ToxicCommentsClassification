@@ -50,23 +50,25 @@ def get_wordnet_pos(treebank_tag):
 #clean comment text
 def cleanComment(comment):
     #clean url, emoji, mention, smiley
-    clean_Url = re.sub(URL_PATTERN, '', comment)
+    clean_Url = re.sub(URL_PATTERN, ' ', comment)
     clean_UrlSmile = clean_Url.replace(":-)" , " ").replace(":)"," ").replace(";-)", " ").replace(";)"," ") #':-)', ':)', ';-)', ';)'
-    clean_UrlSmileIP = re.sub(IP_PATTERN, '', clean_UrlSmile)
-    clean_final = re.sub(NUMBERS_PATTERN, '', clean_UrlSmileIP)
+    clean_UrlSmileIP = re.sub(IP_PATTERN, ' ', clean_UrlSmile)
+    clean_final = re.sub(NUMBERS_PATTERN, ' ', clean_UrlSmileIP)
     #lower case
     commentText = clean_final.replace("\n"," ").lower()
+    #replace non-letters
+    commentText = re.sub(r'[^a-zA-Z]+', ' ', commentText)
     #into list
     comment_lst = commentText.split(" ")
     comment_lst = list(filter(None, comment_lst))
     #if not none
     if len(comment_lst) >= 1 and comment_lst[0] != '':
-        #comment_lst = [HTMLParser.HTMLParser().unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
-        comment_lst = [html.unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
+        comment_lst = [HTMLParser.HTMLParser().unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
+        #comment_lst = [html.unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
         #final remove leading/trailing puctuation each word
         comment_lst1 = [s.strip("`~()?:!.,;'""&*<=+ >#|-/{}%$^@[]") for s in comment_lst]
         #remove non-letter in middle
-        comment_lst = [re.sub(r'[^a-zA-Z0-9]+', '', s) for s in comment_lst1]
+        comment_lst = [re.sub(r'[^a-zA-Z]+', '', s) for s in comment_lst1]
         #remove stop words
         filtered_words = [word for word in comment_lst if word not in stopwords.words('english')]
         #remove none
@@ -111,7 +113,11 @@ if __name__ == "__main__":
         clean_comment = cleanComment(row["comment_text"])
         clean_comments.append(clean_comment)
     
+    #add the clean_comments
     train["clean_comment"] = clean_comments
+    
+    #drop the raw comments
+    train = train.drop(columns=["comment_text"])
     
     _log.info("writing file ...")    
     #with open('/home/ang/Comments/clean_comments.pkl', 'wb') as f:
