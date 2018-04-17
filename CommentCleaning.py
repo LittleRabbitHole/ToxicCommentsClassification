@@ -61,8 +61,8 @@ def cleanComment(comment):
     comment_lst = list(filter(None, comment_lst))
     #if not none
     if len(comment_lst) >= 1 and comment_lst[0] != '':
-        comment_lst = [HTMLParser.HTMLParser().unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
-        #comment_lst = [html.unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
+        #comment_lst = [HTMLParser.HTMLParser().unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
+        comment_lst = [html.unescape(y.strip().replace('"','').replace('\n','')) for y in comment_lst]
         #final remove leading/trailing puctuation each word
         comment_lst1 = [s.strip("`~()?:!.,;'""&*<=+ >#|-/{}%$^@[]") for s in comment_lst]
         #remove non-letter in middle
