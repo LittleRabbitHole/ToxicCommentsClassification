@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr 17 21:35:30 2018
+
+@author: Ang
+"""
+
+import pickle
+import os
+from gensim.models import Word2Vec
+import pandas as pd
+
+model_dir_path = os.path.dirname(os.path.realpath("/home/ang/Comments/w2vmodel"))
+model_path = '{}/w2vmodel'.format(model_dir_path)
+model = Word2Vec.load('{}/cleantxt_200.w2v'.format(model_path))
+#print (model.most_similar('revert'))
+
+train = pd.read_csv("train_cleaned.csv")
+rowsums=train.iloc[:,1:6].sum(axis=1)
+train['clean']=(rowsums==0)
+
+extr_toxic = train[train['severe_toxic'] == 1]
+extr_toxic_ids = extr_toxic['id'].tolist()
+extr_toxic_ids = extr_toxic_ids[0:100]
+
+clean = train[train['clean'] == 1]
+clean_ids = clean['id'].tolist()
+clean_ids = clean_ids[0:100]
+
+train_c2v = pickle.load( open( "train_c2v.pkl", "rb" ) )
+
+clean_vec = []
+for idx in clean_ids:
+    clean_vec.append(train_c2v[idx])
+
+toxic_vec = []
+for idx in extr_toxic_ids:
+    toxic_vec.append(train_c2v[idx])
+
+vec = clean_vec + toxic_vec   
