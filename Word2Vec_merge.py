@@ -82,6 +82,6 @@ if __name__ == "__main__":
         pickle.dump(comment2vec, f)
     #comment2vec.to_pickle("/home/ang/Comments/train_c2v.pkl")
     print ('num of comments that has no vecs is: '+str(n) + '\n' + "# of empty comments: "+str(m))
-    #df = pd.read_pickle("/home/ang/BLM_hashtags/aggre_data/aggre_tweet_hashtag_t2v.pkl")
+    #df = pd.read_pickle("/home/ang/Comments/train_c2v.pkl")
     #clean train: 159505
 

@@ -14,6 +14,32 @@ NUMBERS_PATTERN = re.compile(r"(^|\s)(\-?\d+(?:\.\d)*|\d+)")
 IP_PATTERN = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
 
 
+def trySum(c, dic):
+    comment = c['clean_comment']
+    try:
+        comment_lst = comment.split(" ")
+        ct=0
+        for x in comment_lst:
+            if  x in dic:
+                ct += 1 
+        return (ct)
+    except AttributeError:
+        return (0)
+
+def tryScore(c):
+    comment = c['clean_comment']
+    try:
+        comment_lst = comment.split(" ")
+        ct=0
+        sumscore = 0
+        for x in comment_lst:
+            sumscore += sem_score.get(x.strip(),0.00) 
+            ct += 1 
+        return (sumscore/(ct+0.001))
+    except AttributeError:
+        return (0)
+
+
 if __name__ == "__main__":
     #loading the dictionary
     positive_list = pd.read_table("/Users/angli/ANG/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/dictionary/positive-words.txt", header=None)
@@ -24,7 +50,7 @@ if __name__ == "__main__":
     sem_score = sem_score.rename(index=str, columns={0: "score", 1: "word"}) 
     sem_score = pd.Series(sem_score.score.values,index=sem_score.word).to_dict()
     
-    #get the basic features
+    #get the basic features from raw comments
     train = pd.read_csv("/Users/angli/ANG/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/train.csv")
     train['total_length'] = train['comment_text'].apply(len)
     train['capitals'] = train['comment_text'].apply(lambda comment: sum(1 for c in comment if c.isupper()))
@@ -41,36 +67,39 @@ if __name__ == "__main__":
     train['num_IP'] = train['comment_text'].apply(lambda comment: len(re.findall(IP_PATTERN, comment)))
     train['num_URL'] = train['comment_text'].apply(lambda comment: len(re.findall(URL_PATTERN, comment)))
     #features from dictionary
-    train['comment_text_lower'] = train['comment_text'].str.lower()
-    train['num_positive'] = train['comment_text_lower'].apply(lambda comment: sum(comment.count(w) for w in positive_list))
-    train['num_negtive'] = train['comment_text_lower'].apply(lambda comment: sum(comment.count(w) for w in negative_list))
-    train['score'] = train['comment_text_lower'].apply(lambda comment: sum(sem_score.get(c.strip(),0.00) for c in comment.split(" ")))
-    train['score'] = train.apply(lambda row: float(row['score'])/float(row['num_words'] + 0.001), axis=1)
+    clean_train = pd.read_csv("/Users/angli/ANG/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/train_cleaned.csv")
+    #train['comment_text_lower'] = train['comment_text'].str.lower()
+    clean_train['num_positive'] = clean_train.apply(trySum,  axis=1, dic = positive_list)
+    clean_train['num_negtive'] = clean_train.apply(trySum,  axis=1, dic = negative_list)
+    clean_train['score'] = clean_train.apply(tryScore, axis=1)
+    clean_train = clean_train[['id', 'num_positive', 'num_negtive', 'score']]
+    #merge all features together
+    train = pd.merge(train, clean_train, on = "id")
     train = train[['id', 'total_length', 'capitals', 'caps_vs_length', 'num_exclamation_marks', 'num_question_marks', 'num_punctuation', 'num_symbols', 'num_we', 'num_words', 'num_unique_words', 'words_vs_unique', 'num_smilies', 'num_IP', 'num_URL', 'num_positive', 'num_negtive', 'score', 'toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']]
     train.to_csv("train_features.csv", index=False)
 
-    test = pd.read_csv("/Users/angli/ANG/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/test.csv")
-    #get the basic features
-    test['total_length'] = test['comment_text'].apply(len)
-    test['capitals'] = test['comment_text'].apply(lambda comment: sum(1 for c in comment if c.isupper()))
-    test['caps_vs_length'] = test.apply(lambda row: float(row['capitals'])/float(row['total_length'] + 0.001), axis=1)
-    test['num_exclamation_marks'] = test['comment_text'].apply(lambda comment: comment.count('!'))
-    test['num_question_marks'] = test['comment_text'].apply(lambda comment: comment.count('?'))
-    test['num_punctuation'] = test['comment_text'].apply(lambda comment: sum(comment.count(w) for w in '.,;:'))
-    test['num_symbols'] = test['comment_text'].apply(lambda comment: sum(comment.count(w) for w in '*&$%'))
-    test['num_we'] = test['comment_text'].apply(lambda comment: sum(comment.count(w) for w in ['we', 'We', 'WE']))
-    test['num_words'] = test['comment_text'].apply(lambda comment: len(comment.split(" ")))
-    test['num_unique_words'] = test['comment_text'].apply(lambda comment: len(set(w for w in comment.split())))
-    test['words_vs_unique'] = test['num_unique_words'] / (train['num_words']+0.0001)
-    test['num_smilies'] = test['comment_text'].apply(lambda comment: sum(comment.count(w) for w in (':-)', ':)', ';-)', ';)')))
-    test['num_IP'] = test['comment_text'].apply(lambda comment: len(re.findall(IP_PATTERN, comment)))
-    test['num_URL'] = test['comment_text'].apply(lambda comment: len(re.findall(URL_PATTERN, comment)))
-    #features from dictionary
-    test['comment_text_lower'] = test['comment_text'].str.lower()
-    test['num_positive'] = test['comment_text_lower'].apply(lambda comment: sum(comment.count(w) for w in positive_list))
-    test['num_negtive'] = test['comment_text_lower'].apply(lambda comment: sum(comment.count(w) for w in negative_list))
-    test['score'] = test['comment_text_lower'].apply(lambda comment: sum(sem_score.get(c.strip(),0.00) for c in comment.split(" ")))
-    test['score'] = test.apply(lambda row: float(row['score'])/float(row['num_words'] + 0.001), axis=1)
-    test = test[['id', 'total_length', 'capitals', 'caps_vs_length', 'num_exclamation_marks', 'num_question_marks', 'num_punctuation', 'num_symbols', 'num_we', 'num_words', 'num_unique_words', 'words_vs_unique', 'num_smilies', 'num_IP', 'num_URL', 'num_positive', 'num_negtive', 'score']]
-    test.to_csv("test_features.csv", index=False)
+#    test = pd.read_csv("/Users/angli/ANG/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/test.csv")
+#    #get the basic features
+#    test['total_length'] = test['comment_text'].apply(len)
+#    test['capitals'] = test['comment_text'].apply(lambda comment: sum(1 for c in comment if c.isupper()))
+#    test['caps_vs_length'] = test.apply(lambda row: float(row['capitals'])/float(row['total_length'] + 0.001), axis=1)
+#    test['num_exclamation_marks'] = test['comment_text'].apply(lambda comment: comment.count('!'))
+#    test['num_question_marks'] = test['comment_text'].apply(lambda comment: comment.count('?'))
+#    test['num_punctuation'] = test['comment_text'].apply(lambda comment: sum(comment.count(w) for w in '.,;:'))
+#    test['num_symbols'] = test['comment_text'].apply(lambda comment: sum(comment.count(w) for w in '*&$%'))
+#    test['num_we'] = test['comment_text'].apply(lambda comment: sum(comment.count(w) for w in ['we', 'We', 'WE']))
+#    test['num_words'] = test['comment_text'].apply(lambda comment: len(comment.split(" ")))
+#    test['num_unique_words'] = test['comment_text'].apply(lambda comment: len(set(w for w in comment.split())))
+#    test['words_vs_unique'] = test['num_unique_words'] / (train['num_words']+0.0001)
+#    test['num_smilies'] = test['comment_text'].apply(lambda comment: sum(comment.count(w) for w in (':-)', ':)', ';-)', ';)')))
+#    test['num_IP'] = test['comment_text'].apply(lambda comment: len(re.findall(IP_PATTERN, comment)))
+#    test['num_URL'] = test['comment_text'].apply(lambda comment: len(re.findall(URL_PATTERN, comment)))
+#    #features from dictionary
+#    test['comment_text_lower'] = test['comment_text'].str.lower()
+#    test['num_positive'] = test['comment_text_lower'].apply(lambda comment: sum(comment.count(w) for w in positive_list))
+#    test['num_negtive'] = test['comment_text_lower'].apply(lambda comment: sum(comment.count(w) for w in negative_list))
+#    test['score'] = test['comment_text_lower'].apply(lambda comment: sum(sem_score.get(c.strip(),0.00) for c in comment.split(" ")))
+#    test['score'] = test.apply(lambda row: float(row['score'])/float(row['num_words'] + 0.001), axis=1)
+#    test = test[['id', 'total_length', 'capitals', 'caps_vs_length', 'num_exclamation_marks', 'num_question_marks', 'num_punctuation', 'num_symbols', 'num_we', 'num_words', 'num_unique_words', 'words_vs_unique', 'num_smilies', 'num_IP', 'num_URL', 'num_positive', 'num_negtive', 'score']]
+#    test.to_csv("test_features.csv", index=False)
     

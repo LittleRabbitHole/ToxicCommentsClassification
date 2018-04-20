@@ -12,7 +12,7 @@ from gensim.models import Word2Vec
 import pandas as pd
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
-
+import seaborn as sns
 
 model_dir_path = os.path.dirname(os.path.realpath("/home/ang/Comments/w2vmodel"))
 model_path = '{}/w2vmodel'.format(model_dir_path)
@@ -46,22 +46,22 @@ vec = clean_vec + toxic_vec
 pickle.dump( vec, open( "vec200_plot.p", "wb" ) )
 
 #plot the 2000 vec
-with open('/Users/Ang/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/vec200_plot.p', 'rb') as f:
+with open('/Users/angli/Ang/OneDrive/Documents/Pitt_PhD/Class/2018Spring/ML/finalProject/data/vec200_plot.p', 'rb') as f:
         vec = pickle.load(f, encoding='bytes')
     
 tsne_model = TSNE(perplexity=40, n_components=2, init='pca', n_iter=2500, random_state=23)
 tsne_model = TSNE(n_components=2)
-new_values = tsne_model.fit_transform(vec)    
+new_values = tsne_model.fit_transform(vec)   
+new_values_df = pd.DataFrame(new_values) 
+label = [1]*1000 + [2]*1000
+new_values_df['label'] = label
 
-x = []
-y = []
-for value in new_values:
-    x.append(value[0])
-    y.append(value[1])
 
-fig = plt.figure(figsize=(8, 8))
-ax = fig.add_subplot(1, 1, 1)    
-ax.scatter(x, y)
-plt.show()
-fig.savefig('x_tsne.png')
-        
+fig = plt.scatter(new_values_df[0], new_values_df[1], alpha=0.2,
+            s=50, c=new_values_df.label, cmap='viridis')
+
+sns.pairplot(x_vars=[0], y_vars=[1], data=new_values_df, hue="label", size=5)
+
+
+
+
