@@ -18,6 +18,7 @@ model_dir_path = os.path.dirname(os.path.realpath("/home/ang/Comments/w2vmodel")
 model_path = '{}/w2vmodel'.format(model_dir_path)
 model = Word2Vec.load('{}/cleantxt_200.w2v'.format(model_path))
 #print (model.most_similar('revert'))
+#w2v_model.vocab
 
 train = pd.read_csv("train_cleaned.csv")
 rowsums=train.iloc[:,1:6].sum(axis=1)
