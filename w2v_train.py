@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Apr 11 11:16:44 2018
-
+this is to train w2v model
 @author: angli
 """
 import pickle
