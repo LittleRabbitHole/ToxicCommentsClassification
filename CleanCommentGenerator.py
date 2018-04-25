@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Apr 11 11:21:25 2018
-
+this is to process all the raw comments
+and generate the clean comments
 @author: angli
 """
 #import pandas as pd
