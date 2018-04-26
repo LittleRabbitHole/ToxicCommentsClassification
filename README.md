@@ -1,11 +1,14 @@
-# ToxicCommentsClassification -- Kaggle comp
+# Toxic Comments 
 
 ## Project overview
 ### https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge
-Discussing things you care about can be difficult. The threat of abuse and harassment online means that many people stop expressing themselves and give up on seeking different opinions. Platforms struggle to effectively facilitate conversations, leading many communities to limit or completely shut down user comments.
 
-The Conversation AI team, a research initiative founded by Jigsaw and Google (both a part of Alphabet) are working on tools to help improve online conversation. One area of focus is the study of negative online behaviors, like toxic comments (i.e. comments that are rude, disrespectful or otherwise likely to make someone leave a discussion). So far they’ve built a range of publicly available models served through the Perspective API, including toxicity. But the current models still make errors, and they don’t allow users to select which types of toxicity they’re interested in finding (e.g. some platforms may be fine with profanity, but not with other types of toxic content).
+For most online communities, social interaction and discussion are the core mechanisms, through which users communicate
+with each other to share information and exchange opinions for diverse topics. However, the anonymity afforded by such
+online communities has led to the increase of misbehavior, such as abuse and harassment, spread of propaganda, hate speech, and many more. Such misbehavior negatively influence the users online experience and impede the healthiness of the online environment. Using 159,571 human labelled online discussion comments under Wikipedia discussion pages, current project intends to solve the problem by providing a technical tool to detect the toxic social interactions accurately and effectively. Utilizing an enriched word embedding feature sets and different machine learning techniques, the proposed model is able to achieve both high overall accuracy rate as well as F1 score in detecting the toxic comments from ordinary comments.
 
-In this competition, you’re challenged to build a multi-headed model that’s capable of detecting different types of of toxicity like threats, obscenity, insults, and identity-based hate better than Perspective’s current models. You’ll be using a dataset of comments from Wikipedia’s talk page edits. Improvements to the current model will hopefully help online discussion become more productive and respectful.
 
-Disclaimer: the dataset for this competition contains text that may be considered profane, vulgar, or offensive.
+####### Presentation slides: Results.pdf
+####### Detection with word level features: DataExplorationPrediction_Features.ipynb 
+####### Detection with word embedding features: DataExplorationPrediction_w2v.ipynb 
+####### w2v_train.py
