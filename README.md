@@ -9,7 +9,7 @@ online communities has led to the increase of misbehavior, such as abuse and har
 
 ### Results:
 
-Presentation slides: Results.pdf
+Presentation slides: [https://github.com/LittleRabbitHole/ToxicCommentsClassification/blob/master/Results.pdf]
 
 Detection with word level features: DataExplorationPrediction_Features.ipynb 
 
